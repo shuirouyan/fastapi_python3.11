@@ -52,12 +52,22 @@ async def get_users(name: str = None, db: AsyncSession = Depends(get_db)) -> str
 
 
 @app.get("/mysql_version", name="获取 MySQL 版本", tags=["数据库管理"])
-async def get_mysql_version(db: AsyncSession = Depends(get_db)) -> Dict[str, str]:
+async def get_mysql_version(db: AsyncSession = Depends(get_db)) -> Dict[str, object]:
     result = await db.execute(text("SELECT VERSION()"))
     version = result.scalar()
     logger.info("MySQL version: {}".format(version))
-    return {"mysql_version": version}
+    result2 = await db.execute(text("select current_timestamp()"))
+    current_timestamp = str(result2.scalar())
+    result3 = await db.execute(text("show variables"))
+    variables_dict = result3.fetchall()
+    variables_list = {v[0]: v[1] for v in variables_dict}
+    return {
+        "mysql_version": version,
+        "current_timestamp": current_timestamp,
+        "variables_list": variables_list,
+    }
 
 
 if __name__ == "__main__":
+    logger.info("Starting the FastAPI application")
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, log_level="info")
