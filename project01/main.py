@@ -1,11 +1,12 @@
 from fastapi import FastAPI, Request, Depends
 import uvicorn
 from logger import logger
-from sqlalchemy import select
+from sqlalchemy import select, insert, update, delete
 from database import get_db
 from model.UserSmsCode import UserSmsCode
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
+from datetime import datetime
 import json
 from typing import Dict
 
@@ -66,6 +67,93 @@ async def get_mysql_version(db: AsyncSession = Depends(get_db)) -> Dict[str, obj
         "current_timestamp": current_timestamp,
         "variables_list": variables_list,
     }
+
+
+@app.post("/save", tags=["CRUD"], name="新增用户")
+async def user_sms_code_method(req: Request, db: AsyncSession = Depends(get_db)):
+    body = await req.body()
+    bodys = body.decode("utf-8")
+    logger.info("Received request: {}".format(bodys))
+
+    stm = insert(UserSmsCode).values(
+        mobile_no=12345678901,
+        sms_code="123456",
+        send_time=datetime.now(),
+        create_time=datetime.now(),
+    )
+    result = await db.execute(stm)
+    results = result.rowcount
+    return {"msg": "ok", "results": results}
+
+
+@app.post("/update", tags=["CRUD"], name="更新用户")
+async def user_sms_code_method(req: Request, db: AsyncSession = Depends(get_db)):
+    body = await req.body()
+    bodys = body.decode("utf-8")
+    logger.info("Received request: {}".format(bodys))
+    stm = (
+        update(UserSmsCode)
+        .where(UserSmsCode.id == 99999999)
+        .values(mobile_no=983722738, sms_code="seq_no2", send_time=datetime.now())
+    )
+
+    result = await db.execute(stm)
+    results = result.rowcount
+    return {"msg": "ok", "results": results, "headers": req.headers}
+
+
+@app.get("/get", tags=["CRUD"], name="获取用户")
+async def user_sms_code_method(req: Request, db: AsyncSession = Depends(get_db)):
+    body = await req.body()
+    bodys = body.decode("utf-8")
+    logger.info("Received request: {}".format(bodys))
+    stm = select(UserSmsCode).where().order_by(UserSmsCode.id.desc())
+
+    result = await db.execute(stm)
+    results = result.scalars().all()
+    result_dict = [item.to_dict() for item in results]
+
+    return {"msg": "ok", "results": result_dict, "headers": req.headers}
+
+
+@app.get("/get/{id}", tags=["CRUD"], name="获取用户detail")
+async def user_sms_code_method(
+    req: Request, id: int, db: AsyncSession = Depends(get_db)
+):
+    body = await req.body()
+    bodys = body.decode("utf-8")
+    logger.info("Received request: {}".format(bodys))
+    stm = (
+        select(UserSmsCode.id, UserSmsCode.create_time)
+        .where(UserSmsCode.id == id)
+        .order_by(UserSmsCode.id.desc())
+    )
+    result = await db.execute(stm)
+
+    result2 = result.mappings().fetchall()
+
+    return {
+        "msg": "ok",
+        "results": result2,
+        "headers": req.headers,
+    }
+
+
+@app.post("/delete/{id}", tags=["CRUD"], name="删除用户")
+async def user_sms_code_method(
+    req: Request, id: int, db: AsyncSession = Depends(get_db)
+):
+    body = await req.body()
+    bodys = body.decode("utf-8")
+
+    logger.info("Received request: {}".format(bodys))
+
+    stm = delete(UserSmsCode).where(UserSmsCode.id == id)
+
+    result = await db.execute(stm)
+    results = result.rowcount
+
+    return {"msg": "ok", "results": results, "headers": req.headers}
 
 
 if __name__ == "__main__":
