@@ -4,6 +4,8 @@ from logger import logger
 from sqlalchemy import select, insert, update, delete
 from database import get_db
 from model.UserSmsCode import UserSmsCode
+from model.req.request import UserSmsCodeReq
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from datetime import datetime
@@ -70,16 +72,18 @@ async def get_mysql_version(db: AsyncSession = Depends(get_db)) -> Dict[str, obj
 
 
 @app.post("/save", tags=["CRUD"], name="新增用户")
-async def user_sms_code_method(req: Request, db: AsyncSession = Depends(get_db)):
+async def user_sms_code_method(
+    req: Request, user: UserSmsCodeReq, db: AsyncSession = Depends(get_db)
+):
     body = await req.body()
     bodys = body.decode("utf-8")
-    logger.info("Received request: {}".format(bodys))
+    logger.info("Received request: {}, user:{}".format(bodys, user.json()))
 
     stm = insert(UserSmsCode).values(
-        mobile_no=12345678901,
-        sms_code="123456",
-        send_time=datetime.now(),
-        create_time=datetime.now(),
+        mobile_no=user.mobile_no,
+        sms_code=user.sms_code,
+        send_time=user.send_time,
+        create_time=user.create_time,
     )
     result = await db.execute(stm)
     results = result.rowcount
@@ -112,7 +116,20 @@ async def user_sms_code_method(req: Request, db: AsyncSession = Depends(get_db))
     result = await db.execute(stm)
     results = result.scalars().all()
     result_dict = [item.to_dict() for item in results]
-
+    stm2 = (
+        select(
+            UserSmsCode.id,
+            UserSmsCode.mobile_no,
+            UserSmsCode.sms_code,
+            UserSmsCode.send_time,
+            UserSmsCode.create_time,
+        )
+        .where()
+        .order_by(UserSmsCode.id.desc())
+    )
+    res_data_execute = await db.execute(stm2)
+    res_data = res_data_execute.mappings().fetchall()
+    logger.info("all data:{}".format(res_data))
     return {"msg": "ok", "results": result_dict, "headers": req.headers}
 
 

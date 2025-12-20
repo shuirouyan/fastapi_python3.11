@@ -1,7 +1,7 @@
 from sqlalchemy.orm import DeclarativeBase
 
 from sqlalchemy.orm import Mapped, mapped_column as Column
-from sqlalchemy import Integer, String, DateTime
+from sqlalchemy import Integer, String, DateTime, BigInteger
 
 
 class Base(DeclarativeBase):
@@ -10,7 +10,7 @@ class Base(DeclarativeBase):
 
 class UserSmsCode(Base):
     __tablename__ = "user_sms_code"
-    id: Mapped[int] = Column(primary_key=True, index=True)
+    id = Column(BigInteger, primary_key=True, index=True)
     mobile_no = Column(Integer, nullable=True)
     sms_code = Column(String(6), nullable=True)
     send_time = Column(DateTime, nullable=False, default=DateTime)
