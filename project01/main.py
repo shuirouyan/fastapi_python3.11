@@ -12,8 +12,14 @@ from datetime import datetime
 import json
 from typing import Dict
 
+from route.route1 import router
+from route.route2 import route as route2
+
 logger.info("Starting the FastAPI application")
 app = FastAPI()
+
+app.include_router(router)
+app.include_router(route2)
 
 
 @app.get("/", name="根目录", tags=["基础功能"])

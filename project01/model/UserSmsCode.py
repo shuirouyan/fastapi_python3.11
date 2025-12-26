@@ -19,7 +19,7 @@ class UserSmsCode(Base):
     # 新增：转字典方法
     def to_dict(self):
         return {
-            "id": self.id,
+            "id": str(self.id),
             "mobile_no": self.mobile_no,
             "sms_code": self.sms_code,
             # 时间类型格式化（关键，否则 JSON 序列化失败）
