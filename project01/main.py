@@ -14,12 +14,14 @@ from typing import Dict
 
 from route.route1 import router
 from route.route2 import route as route2
+from route.route3 import route3
 
 logger.info("Starting the FastAPI application")
 app = FastAPI()
 
 app.include_router(router)
 app.include_router(route2)
+app.include_router(route3)
 
 
 @app.get("/", name="根目录", tags=["基础功能"])
