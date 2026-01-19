@@ -8,6 +8,9 @@ from logger import logger
 
 from fastapi.responses import JSONResponse, RedirectResponse
 import json
+from fastapi.security import OAuth2PasswordBearer
+import bcrypt
+
 
 # route3使用JSONResponse
 route3 = APIRouter(prefix="/v3", tags=["V3"])
@@ -50,3 +53,10 @@ async def redirect_method(
     headers = request.headers
     # headers["param1"] = param1
     return RedirectResponse(url=param2, headers=headers)
+
+
+@route3.get("/passwd")
+async def get_passwd_method(passwd: str) -> dict:
+    """密码加密"""
+    pass_str = bcrypt.hashpw(passwd.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    return {"msg": "ok", "passwd": "<PASSWORD>", "pass_str": pass_str}
