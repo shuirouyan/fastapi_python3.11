@@ -28,13 +28,19 @@ async def get_redis_info(
 
 @route4.post("/save", tags=["澎湃新闻"])
 async def pengpai_info_msg(
-    request: Request, redis: Redis = Depends(get_redis_connection), id: str = "default"
+    request: Request,
+    redis: Redis = Depends(get_redis_connection),
+    id: str = "default",
+    name: str = "default",
 ):
     body = await request.body()
     body_str = body.decode("utf-8")
     body_json = json.loads(body_str)
     logger.info(f"body:{body_json}")
-    await redis.setnx(f"pengpai:{id}", body_json)
+    if body != None and body_str.strip() != "":
+        await redis.setnx(f"pengpai:{name}", body_json)
+    else:
+        logger.info("Empty body received, id:{id}")
     return {
         "msg": "ok",
         "timestamp": int(datetime.datetime.timestamp(datetime.datetime.now())),
