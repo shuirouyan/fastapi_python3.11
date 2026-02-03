@@ -24,3 +24,18 @@ async def get_redis_info(
     timestamp_str = str(int(datetime.datetime.timestamp(datetime.datetime.now())))
     await redis.set(f"key_val:{timestamp_str}", f"value:{timestamp_str}")
     return {"signature": "asfewaKSFfesfsfjjjKS"}
+
+
+@route4.post("/save", tags=["澎湃新闻"])
+async def pengpai_info_msg(
+    request: Request, redis: Redis = Depends(get_redis_connection), id: str = "default"
+):
+    body = await request.body()
+    body_str = body.decode("utf-8")
+    body_json = json.loads(body_str)
+    logger.info(f"body:{body_json}")
+    await redis.setnx(f"pengpai:{id}", body_json)
+    return {
+        "msg": "ok",
+        "timestamp": int(datetime.datetime.timestamp(datetime.datetime.now())),
+    }
