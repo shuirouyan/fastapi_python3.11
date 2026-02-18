@@ -8,10 +8,10 @@ _redis_pool = None
 _redis_lock = asyncio.Lock()
 
 # Redis 配置
-REDIS_HOST = "192.168.159.17"
+REDIS_HOST = "192.168.159.18"
 REDIS_PORT = 6379
 REDIS_DB = 0
-REDIS_PASSWORD = "redis"
+REDIS_PASSWORD = "redis123"
 REDIS_POOL_MAX = 5
 
 async def get_redis_pool():
