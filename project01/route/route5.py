@@ -28,7 +28,7 @@ async def pengpai_info_msg(
         # 保存到数据库
         body_json_str = json.dumps(body_json, ensure_ascii=False)
         stm = insert(PengpaiNews).values(
-            title=name, news_id=id, conent_msg=body_json_str
+            title=name, news_id=id, content_msg=body_json_str
         )
         result_row = await db.execute(stm)
         rowcount = result_row.rowcount
