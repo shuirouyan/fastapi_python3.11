@@ -26,9 +26,13 @@ async def pengpai_info_msg(
     if body != None and body_str.strip() != "":
         # await redis.setnx(f"pengpai:{name}", body_json)
         # 保存到数据库
-        stm = insert(PengpaiNews).values(title=name, conent_msg=body)
+        body_json_str = json.dumps(body_json, ensure_ascii=False)
+        stm = insert(PengpaiNews).values(
+            title=name, news_id=id, conent_msg=body_json_str
+        )
         result_row = await db.execute(stm)
-        logger.info(f"result_row:{result_row}")
+        rowcount = result_row.rowcount
+        logger.info(f"result_row:{rowcount}")
     else:
         logger.info("Empty body received, id:{id}")
     return {
