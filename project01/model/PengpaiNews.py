@@ -1,7 +1,7 @@
 from sqlalchemy.orm import DeclarativeBase
 
 from sqlalchemy.orm import Mapped, mapped_column as Column
-from sqlalchemy import Integer, String, DateTime, BIGINT, TEXT
+from sqlalchemy import Integer, String, TIMESTAMP, BIGINT, TEXT
 
 
 class Base(DeclarativeBase):
@@ -23,4 +23,4 @@ class PengpaiNews(Base):
     id = Column(BIGINT, primary_key=True, index=True)
     title = Column(String(255), nullable=True)
     conent_msg = Column(TEXT)
-    create_time = Column(DateTime, nullable=True, default=DateTime)
+    create_time = Column(TIMESTAMP, nullable=True)
