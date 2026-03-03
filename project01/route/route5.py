@@ -6,7 +6,7 @@ import json
 from database import get_db
 import datetime
 from redis.asyncio import Redis
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 from model.PengpaiNews import PengpaiNews
 
 route5 = APIRouter(prefix="/v5", tags=["V5"])
@@ -30,9 +30,15 @@ async def pengpai_info_msg(
         stm = insert(PengpaiNews).values(
             title=name, news_id=id, content_msg=body_json_str
         )
-        result_row = await db.execute(stm)
-        rowcount = result_row.rowcount
-        logger.info(f"result_row:{rowcount}")
+        pre_stm = select(PengpaiNews).where(PengpaiNews.news_id == id).limit(1)
+        exec_result = await db.execute(pre_stm)
+        exists_val = exec_result.scalar_one_or_none        
+        if exists_val is None:
+            result_row = await db.execute(stm)
+            rowcount = result_row.rowcount
+            logger.info(f"result_row:{rowcount}")
+        else:
+            logger.info(f"id is dumplicate:{id}")
     else:
         logger.info("Empty body received, id:{id}")
     return {
