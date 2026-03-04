@@ -32,7 +32,7 @@ async def pengpai_info_msg(
         )
         pre_stm = select(PengpaiNews).where(PengpaiNews.news_id == id).limit(1)
         exec_result = await db.execute(pre_stm)
-        exists_val = exec_result.scalar_one_or_none        
+        exists_val = exec_result.scalar_one_or_none()
         if exists_val is None:
             result_row = await db.execute(stm)
             rowcount = result_row.rowcount
