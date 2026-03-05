@@ -10,14 +10,15 @@ class Base(DeclarativeBase):
 
 class PengpaiNews(Base):
     """
-    CREATE TABLE `pengpai_news` (
+     CREATE TABLE `pengpai_news` (
       `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
       `title` varchar(255) DEFAULT NULL COMMENT 'title',
       `news_id` varchar(128) DEFAULT NULL COMMENT '新闻第',
       `content_msg` longtext COMMENT '内容',
       `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-      PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `idx_news_id` (`news_id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=590 DEFAULT CHARSET=utf8mb4
     """
 
     __tablename__ = "pengpai_news"
