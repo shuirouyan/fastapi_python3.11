@@ -17,10 +17,6 @@ async def get_redis_info(
     """
     redis info
     """
-    body = None
-    if body != None:
-        body_str = json.dumps(body)
-        logger.info(f"body:{body_str}")
     timestamp_str = str(int(datetime.datetime.timestamp(datetime.datetime.now())))
     await redis.set(f"key_val:{timestamp_str}", f"value:{timestamp_str}")
     return {"signature": "asfewaKSFfesfsfjjjKS"}
@@ -34,13 +30,37 @@ async def pengpai_info_msg(
     name: str = "default",
 ):
     body = await request.body()
-    body_str = body.decode("utf-8")
-    body_json = json.loads(body_str)
-    logger.info(f"body:{body_json}")
-    if body != None and body_str.strip() != "":
-        await redis.setnx(f"pengpai:{name}", body_json)
-    else:
-        logger.info("Empty body received, id:{id}")
+    if not body:
+        logger.info(f"Empty body received, id:{id}")
+        return {
+            "msg": "ok",
+            "timestamp": int(datetime.datetime.timestamp(datetime.datetime.now())),
+        }
+
+    try:
+        body_str = body.decode("utf-8")
+        body_json = json.loads(body_str)
+        logger.info(f"body:{body_json}")
+        # 将 JSON 对象转换为格式化的汉字字符串存储
+        json_str = json.dumps(body_json, ensure_ascii=False, indent=2)
+        if json_str.strip() != "":
+            # await redis.setnx(f"pengpai:{id}", json_str)
+            await redis.zadd(f"pengpai", {name: id})
+        else:
+            pass
+    except json.JSONDecodeError as e:
+        logger.error(f"Invalid JSON received, id:{id}, error:{e}")
+        return {
+            "msg": "invalid JSON",
+            "timestamp": int(datetime.datetime.timestamp(datetime.datetime.now())),
+        }
+    except Exception as e:
+        logger.error(f"Unexpected error, id:{id}, error:{e}")
+        return {
+            "msg": "internal error",
+            "timestamp": int(datetime.datetime.timestamp(datetime.datetime.now())),
+        }
+
     return {
         "msg": "ok",
         "timestamp": int(datetime.datetime.timestamp(datetime.datetime.now())),
