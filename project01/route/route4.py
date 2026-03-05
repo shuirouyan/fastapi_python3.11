@@ -7,7 +7,7 @@ from redis_utils import get_redis_connection
 import datetime
 from redis.asyncio import Redis
 
-route4 = APIRouter(prefix="/v4", tags=["V4"])
+route4 = APIRouter(prefix="/v4", tags=["澎湃新闻V4"])
 
 
 @route4.get("/info")
@@ -26,7 +26,7 @@ async def get_redis_info(
     return {"signature": "asfewaKSFfesfsfjjjKS"}
 
 
-@route4.post("/save", tags=["澎湃新闻"])
+@route4.post("/save")
 async def pengpai_info_msg(
     request: Request,
     redis: Redis = Depends(get_redis_connection),

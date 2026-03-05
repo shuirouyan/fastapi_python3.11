@@ -9,10 +9,10 @@ from redis.asyncio import Redis
 from sqlalchemy import insert, select, func
 from model.PengpaiNews import PengpaiNews
 
-route5 = APIRouter(prefix="/v5", tags=["V5"])
+route5 = APIRouter(prefix="/v5", tags=["澎湃新闻V5"])
 
 
-@route5.post("/save", tags=["澎湃新闻"])
+@route5.post("/save")
 async def pengpai_info_msg(
     http_request: Request,
     db: AsyncSession = Depends(get_db),
@@ -47,9 +47,15 @@ async def pengpai_info_msg(
     }
 
 
-@route5.get("/get", tags=["澎湃新闻"])
+@route5.get("/get")
 async def get_pengpai_news(
-    http_request: Request, db: AsyncSession = Depends(get_db), size: int = 10, page: int = 1
+    http_request: Request,
+    db: AsyncSession = Depends(get_db),
+    size: int = 10,
+    page: int = 1,
+    content_msg: str = None,
+    title: str = None,
+    news_id: int = None,
 ):
     # 参数边界验证
     if page < 1:
@@ -61,6 +67,12 @@ async def get_pengpai_news(
 
     # 查询总数
     count_stmt = select(func.count(PengpaiNews.id))
+    if content_msg is not None:
+        count_stmt = count_stmt.where(PengpaiNews.content_msg.like(f"%{content_msg}%"))
+    if title is not None:
+        count_stmt = count_stmt.where(PengpaiNews.title.like(f"%{title}%"))
+    if news_id is not None:
+        count_stmt = count_stmt.where(PengpaiNews.news_id == news_id)
     count_result = await db.execute(count_stmt)
     total = count_result.scalar()
 
@@ -71,6 +83,12 @@ async def get_pengpai_news(
         .offset((page - 1) * size)
         .limit(size)
     )
+    if content_msg is not None:
+        stm = stm.where(PengpaiNews.content_msg.like(f"%{content_msg}%"))
+    if title is not None:
+        stm = stm.where(PengpaiNews.title.like(f"%{title}%"))
+    if news_id is not None:
+        stm = stm.where(PengpaiNews.news_id == news_id)
     result = await db.execute(stm)
     all_page_data = result.mappings().all()
 
@@ -82,5 +100,5 @@ async def get_pengpai_news(
             "size": size,
             "total": total,
             "total_pages": (total + size - 1) // size,
-        }
+        },
     }
