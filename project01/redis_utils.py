@@ -8,7 +8,7 @@ _redis_pool = None
 _redis_lock = asyncio.Lock()
 
 # Redis 配置
-REDIS_HOST = "192.168.159.18"
+REDIS_HOST = "redis_host"
 REDIS_PORT = 6379
 REDIS_DB = 0
 REDIS_PASSWORD = "redis123"
