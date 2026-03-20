@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from logger import logger
 
-MYSQL_URI = "mysql+aiomysql://user03:Aa##123456@10.8.0.1:3306/testdb?charset=utf8mb4"
+MYSQL_URI = "mysql+aiomysql://user03:Aa##123456@127.0.0.1:3306/testdb?charset=utf8mb4"
 
 engine = create_async_engine(
     MYSQL_URI,
