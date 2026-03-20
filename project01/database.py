@@ -1,6 +1,3 @@
-
-
-
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, AsyncConnection
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -8,21 +5,22 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from logger import logger
 
-MYSQL_URI = "mysql+aiomysql://user01:Aa##123456@127.0.0.1:3306/testdb?charset=utf8mb4"
+MYSQL_URI = "mysql+aiomysql://user03:Aa##123456@10.8.0.1:3306/testdb?charset=utf8mb4"
 
-engine = create_async_engine(MYSQL_URI, echo=True)
+engine = create_async_engine(
+    MYSQL_URI,
+    connect_args={"auth_plugin": "caching_sha2_password", "charset": "utf8mb4"},
+    echo=True,
+)
 async_session_local = async_sessionmaker(
-        bind=engine,
-        class_=AsyncSession,
-        expire_on_commit=False,
-        autocommit=False
-    )
+    bind=engine, class_=AsyncSession, expire_on_commit=False, autocommit=False
+)
 
 
 async def get_db():
-    '''
+    """
     获取数据库连接
-    '''
+    """
     async with async_session_local() as session:
         try:
             yield session
@@ -32,7 +30,6 @@ async def get_db():
             raise
         finally:
             await session.close()
-
 
 
 async def get_session() -> AsyncSession:
