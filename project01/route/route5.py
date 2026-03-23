@@ -63,7 +63,7 @@ async def redirect_save_method(request: Request, db: AsyncSession = Depends(get_
 
     stm = insert(PengpaiDatas).values(msg_json=home_page)
     result = await db.execute(stm)
-    result_stat = result.fetchall()
+    result_stat = result.rowcount
     logger.info("result:{result_stat}")
     return {
         "msg": home_page,
