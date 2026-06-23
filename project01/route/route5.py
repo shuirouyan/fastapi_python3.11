@@ -21,6 +21,9 @@ async def pengpai_info_msg(
     id: str = "default",
     name: str = "default",
 ):
+    """
+    记得加try-catch处理，数据库操作失败时，需要回滚
+    """
     body = await request.body()
     body_str = body.decode("utf-8")
     body_json = json.loads(body_str)
